@@ -1,65 +1,128 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState } from "react";
+import { ArrowLeft } from "lucide-react";
+import PageHeading from "@/components/documents/PageHeading";
+import StatsBar from "@/components/documents/StatsBar";
+import FilterBar from "@/components/documents/FilterBar";
+import ExpiringBanner from "@/components/documents/ExpiringBanner";
+import DocumentsTable from "@/components/documents/DocumentsTable";
+import { documents } from "@/lib/documents";
+
+/**
+ * Document Management dashboard page. Section components are composed here;
+ * data is passed in from `lib/` so the UI stays presentational.
+ */
+export default function DocumentManagementPage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedType, setSelectedType] = useState("All");
+  const [selectedStatus, setSelectedStatus] = useState("All");
+
+  // Dynamically compute filtered documents
+  const filteredDocuments = documents.filter((doc) => {
+    // 1. Search Query Filter (name or uploadedBy)
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const nameMatch = doc.name.toLowerCase().includes(q);
+      const uploaderMatch = doc.uploadedBy.toLowerCase().includes(q);
+      if (!nameMatch && !uploaderMatch) return false;
+    }
+
+    // 2. Document Type Filter
+    if (selectedType !== "All") {
+      if (selectedType === "Lab Report") {
+        if (!doc.name.toLowerCase().includes("lab report")) return false;
+      } else {
+        if (doc.type.toLowerCase() !== selectedType.toLowerCase()) return false;
+      }
+    }
+
+    // 3. Status Filter
+    if (selectedStatus !== "All") {
+      if (doc.status.toLowerCase() !== selectedStatus.toLowerCase()) return false;
+    }
+
+    return true;
+  });
+
+  // Calculate dynamic stats based on all documents (unfiltered)
+  const totalStats = {
+    credential: documents.filter((doc) => doc.type === "Credential").length,
+    verified: documents.filter((doc) => doc.status === "verified").length,
+    pending: documents.filter((doc) => doc.status === "pending").length,
+    expiringSoon: documents.filter((doc) => doc.status === "expiry").length,
+  };
+
+  const handleStatsClick = (filterType: "type" | "status", value: string) => {
+    // Toggle filter off if clicked again, otherwise set it
+    setSearchQuery("");
+    if (filterType === "type") {
+      if (selectedType === value) {
+        setSelectedType("All");
+      } else {
+        setSelectedType(value);
+        setSelectedStatus("All");
+      }
+    } else {
+      if (selectedStatus === value) {
+        setSelectedStatus("All");
+      } else {
+        setSelectedStatus(value);
+        setSelectedType("All");
+      }
+    }
+  };
+
+  const handleViewExpiring = () => {
+    setSearchQuery("");
+    setSelectedType("All");
+    setSelectedStatus("expiry");
+  };
+
+  const handleResetFilters = () => {
+    setSearchQuery("");
+    setSelectedType("All");
+    setSelectedStatus("All");
+  };
+
+  const isFiltered = searchQuery !== "" || selectedType !== "All" || selectedStatus !== "All";
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="mx-auto flex max-w-[1200px] flex-col gap-4 p-8">
+      <PageHeading />
+      <StatsBar
+        stats={totalStats}
+        activeType={selectedType}
+        activeStatus={selectedStatus}
+        onSelectFilter={handleStatsClick}
+      />
+      <FilterBar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        selectedType={selectedType}
+        onTypeSelect={setSelectedType}
+        selectedStatus={selectedStatus}
+        onStatusSelect={setSelectedStatus}
+        onClearAll={handleResetFilters}
+      />
+      <ExpiringBanner
+        count={totalStats.expiringSoon}
+        onViewExpiring={handleViewExpiring}
+      />
+      <DocumentsTable documents={filteredDocuments} />
+      
+      {isFiltered && (
+        <div className="mt-4 flex">
+          <button
+            type="button"
+            onClick={handleResetFilters}
+            className="flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <ArrowLeft size={16} />
+            Back to Documents
+          </button>
         </div>
-      </main>
+      )}
     </div>
   );
 }

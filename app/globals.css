@@ -1,26 +1,40 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/*
+ * Design tokens sourced from the Figma "Document Management" design.
+ * Exposed to Tailwind via @theme so utilities like `bg-primary`,
+ * `text-secondary`, `border-border` are generated automatically.
+ */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  /* Brand + semantic colors */
+  --color-primary: #1e3a8a;
+  --color-critical: #dc2626;
+  --color-success: #16a34a;
+  --color-attention: #f59e0b;
+
+  /* Text */
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #6b7280;
+
+  /* Surfaces */
+  --color-surface: #f5f7fa;
+  --color-border: #e5e7eb;
+
+  /* Typography */
+  --font-sans: var(--font-ibm-plex-sans), Arial, Helvetica, sans-serif;
+  --font-heading: var(--font-inter), Arial, Helvetica, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: #f5f7fa;
+  --foreground: #1f2937;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }
