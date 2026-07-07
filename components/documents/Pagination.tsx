@@ -4,7 +4,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
-import Select from "../Select";
+import Select from "../ui/Select";
 
 interface PaginationProps {
   currentPage: number;
@@ -15,7 +15,7 @@ interface PaginationProps {
   onPerPageChange: (perPage: number) => void;
 }
 
-/** Table footer: range summary, page controls, and per-page selector. */
+/** Table footer */
 export default function Pagination({
   currentPage,
   totalPages,

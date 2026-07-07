@@ -1,4 +1,9 @@
-import { BadgeCheck, Hourglass, CalendarClock, type LucideIcon } from "lucide-react";
+import {
+  BadgeCheck,
+  Hourglass,
+  CalendarClock,
+  type LucideIcon,
+} from "lucide-react";
 import type { DocumentStatus } from "@/lib/types";
 
 const config: Record<
@@ -22,7 +27,7 @@ const config: Record<
   },
 };
 
-/** Coloured pill communicating a document's status. */
+/* Coloured pill */
 export default function StatusBadge({ status }: { status: DocumentStatus }) {
   const { label, icon: Icon, className } = config[status];
   return (

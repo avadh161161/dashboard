@@ -1,6 +1,12 @@
 import { Plus } from "lucide-react";
+import type { DocumentRecord } from "@/lib/types";
+import DocumentFormDialog from "./dialogs/DocumentFormDialog";
 
-export default function PageHeading() {
+export default function PageHeading({
+  onSaved,
+}: {
+  onSaved?: (document: DocumentRecord) => void;
+}) {
   return (
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div>
@@ -13,13 +19,16 @@ export default function PageHeading() {
         </p>
       </div>
 
-      <button
-        type="button"
-        className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary/90"
-      >
-        <Plus size={16} />
-        Upload Document
-      </button>
+      {/* Upload Document*/}
+      <DocumentFormDialog mode="upload" onSaved={onSaved}>
+        <button
+          type="button"
+          className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+        >
+          <Plus size={16} />
+          Upload Document
+        </button>
+      </DocumentFormDialog>
     </div>
   );
 }

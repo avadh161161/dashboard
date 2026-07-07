@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { FileText, Eye, Pencil, Download } from "lucide-react";
+import { Eye, Pencil, Download } from "lucide-react";
 import type { DocumentRecord } from "@/lib/types";
 import StatusBadge from "./StatusBadge";
 import Pagination from "./Pagination";
+import DocumentPreviewDialog from "./dialogs/DocumentPreviewDialog";
+import DocumentFormDialog from "./dialogs/DocumentFormDialog";
 
 const columns = [
   "Document Name",
@@ -16,11 +18,12 @@ const columns = [
   "Action",
 ];
 
-/** The documents data table, including header, rows, and footer pagination. */
 export default function DocumentsTable({
   documents,
+  onSaved,
 }: {
   documents: DocumentRecord[];
+  onSaved?: (document: DocumentRecord) => void;
 }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(8);
@@ -28,7 +31,6 @@ export default function DocumentsTable({
   const total = documents.length;
   const totalPages = Math.ceil(total / perPage);
 
-  // Ensure current page is valid when dataset or perPage changes
   const activePage = Math.min(currentPage, totalPages || 1);
 
   const startIndex = (activePage - 1) * perPage;
@@ -36,7 +38,6 @@ export default function DocumentsTable({
 
   const handlePerPageChange = (newPerPage: number) => {
     setPerPage(newPerPage);
-    // Recalculate target page to prevent landing on an out-of-bounds page
     const newTotalPages = Math.ceil(total / newPerPage);
     if (activePage > newTotalPages) {
       setCurrentPage(newTotalPages || 1);
@@ -79,21 +80,23 @@ export default function DocumentsTable({
                       className="h-4 w-4 rounded border-border text-primary"
                     />
                     <span
-                      className="text-text-secondary"
+                      className="text-text-primary font-normal text-[11px]"
                       title={doc.description}
                     >
                       {doc.name}
                     </span>
                   </span>
                 </td>
-                <td className="px-6 py-4 text-text-secondary">{doc.type}</td>
-                <td className="px-6 py-4 text-text-secondary">
+                <td className="px-6 py-4 text-text-primary font-normal text-[11px]">
+                  {doc.type}
+                </td>
+                <td className="px-6 py-4 text-text-primary font-normal text-[11px]">
                   {doc.issuedDate}
                 </td>
-                <td className="px-6 py-4 text-text-secondary">
+                <td className="px-6 py-4 text-text-primary font-normal text-[11px]">
                   {doc.expiryDate ?? "-"}
                 </td>
-                <td className="px-6 py-4 text-text-secondary">
+                <td className="px-6 py-4 text-text-primary font-normal text-[11px]">
                   {doc.uploadedBy}
                 </td>
                 <td className="px-6 py-4">
@@ -101,30 +104,38 @@ export default function DocumentsTable({
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3 text-text-secondary">
-                    <a
-                      href={doc.uploadUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="View"
-                      className="hover:text-primary"
+                    <DocumentPreviewDialog document={doc}>
+                      <div className="relative inline-block group">
+                        <button type="button" aria-label="View">
+                          <Eye size={18} />
+                        </button>
+                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-[#eff6ff] px-2 py-1 text-xs text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100 whitespace-nowrap">
+                          View
+                        </span>
+                      </div>
+                    </DocumentPreviewDialog>
+                    <DocumentFormDialog
+                      mode="edit"
+                      document={doc}
+                      onSaved={onSaved}
                     >
-                      <Eye size={18} />
-                    </a>
-                    <button
-                      type="button"
-                      aria-label="Edit"
-                      className="hover:text-primary"
-                    >
-                      <Pencil size={16} />
-                    </button>
-                    <a
-                      href={doc.uploadUrl}
-                      download
-                      aria-label="Download"
-                      className="hover:text-primary"
-                    >
-                      <Download size={16} />
-                    </a>
+                      <div className="relative inline-block group">
+                        <button type="button" aria-label="Edit">
+                          <Pencil size={16} />
+                        </button>
+                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-[#eff6ff] px-2 py-1 text-xs text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100 whitespace-nowrap">
+                          Edit
+                        </span>
+                      </div>
+                    </DocumentFormDialog>
+                    <div className="relative inline-block group">
+                      <a href={doc.uploadUrl} download aria-label="Download">
+                        <Download size={16} />
+                      </a>
+                      <span className="absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-[#eff6ff] px-2 py-1 text-xs text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100 whitespace-nowrap">
+                        Download
+                      </span>
+                    </div>
                   </div>
                 </td>
               </tr>

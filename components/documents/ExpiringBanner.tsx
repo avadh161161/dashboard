@@ -7,7 +7,7 @@ interface ExpiringBannerProps {
   onViewExpiring?: () => void;
 }
 
-/** Attention banner prompting the user to review soon-to-expire documents. */
+/** Attention banner*/
 export default function ExpiringBanner({
   count,
   onViewExpiring,

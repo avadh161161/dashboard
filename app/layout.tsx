@@ -23,7 +23,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="h-full">
-        {/* App shell: fixed sidebar + (header / scrollable content) */}
         <div className="flex h-screen overflow-hidden">
           <Sidebar />
           <div className="flex flex-1 flex-col overflow-hidden">

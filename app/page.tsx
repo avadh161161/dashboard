@@ -1,26 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ArrowLeft } from "lucide-react";
 import PageHeading from "@/components/documents/PageHeading";
 import StatsBar from "@/components/documents/StatsBar";
 import FilterBar from "@/components/documents/FilterBar";
 import ExpiringBanner from "@/components/documents/ExpiringBanner";
 import DocumentsTable from "@/components/documents/DocumentsTable";
-import { documents } from "@/lib/documents";
+import type { DocumentRecord } from "@/lib/types";
 
-/**
- * Document Management dashboard page. Section components are composed here;
- * data is passed in from `lib/` so the UI stays presentational.
- */
 export default function DocumentManagementPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState("All");
 
+  const [documents, setDocuments] = useState<DocumentRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadDocuments = useCallback(async () => {
+    try {
+      const res = await fetch("/api/documents");
+      if (res.ok) setDocuments((await res.json()) as DocumentRecord[]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadDocuments();
+  }, [loadDocuments]);
+
   // Dynamically compute filtered documents
   const filteredDocuments = documents.filter((doc) => {
-    // 1. Search Query Filter (name or uploadedBy)
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       const nameMatch = doc.name.toLowerCase().includes(q);
@@ -28,7 +39,6 @@ export default function DocumentManagementPage() {
       if (!nameMatch && !uploaderMatch) return false;
     }
 
-    // 2. Document Type Filter
     if (selectedType !== "All") {
       if (selectedType === "Lab Report") {
         if (!doc.name.toLowerCase().includes("lab report")) return false;
@@ -37,15 +47,15 @@ export default function DocumentManagementPage() {
       }
     }
 
-    // 3. Status Filter
     if (selectedStatus !== "All") {
-      if (doc.status.toLowerCase() !== selectedStatus.toLowerCase()) return false;
+      if (doc.status.toLowerCase() !== selectedStatus.toLowerCase())
+        return false;
     }
 
     return true;
   });
 
-  // Calculate dynamic stats based on all documents (unfiltered)
+  // Calculate dynamic stats based on all documents
   const totalStats = {
     credential: documents.filter((doc) => doc.type === "Credential").length,
     verified: documents.filter((doc) => doc.status === "verified").length,
@@ -53,8 +63,12 @@ export default function DocumentManagementPage() {
     expiringSoon: documents.filter((doc) => doc.status === "expiry").length,
   };
 
+  // Most recent pending document
+  const reviewDocument = [...documents]
+    .reverse()
+    .find((doc) => doc.status === "pending");
+
   const handleStatsClick = (filterType: "type" | "status", value: string) => {
-    // Toggle filter off if clicked again, otherwise set it
     setSearchQuery("");
     if (filterType === "type") {
       if (selectedType === value) {
@@ -85,11 +99,12 @@ export default function DocumentManagementPage() {
     setSelectedStatus("All");
   };
 
-  const isFiltered = searchQuery !== "" || selectedType !== "All" || selectedStatus !== "All";
+  const isFiltered =
+    searchQuery !== "" || selectedType !== "All" || selectedStatus !== "All";
 
   return (
     <div className="mx-auto flex max-w-[1200px] flex-col gap-4 p-8">
-      <PageHeading />
+      <PageHeading onSaved={loadDocuments} />
       <StatsBar
         stats={totalStats}
         activeType={selectedType}
@@ -104,13 +119,20 @@ export default function DocumentManagementPage() {
         selectedStatus={selectedStatus}
         onStatusSelect={setSelectedStatus}
         onClearAll={handleResetFilters}
+        reviewDocument={reviewDocument}
       />
       <ExpiringBanner
         count={totalStats.expiringSoon}
         onViewExpiring={handleViewExpiring}
       />
-      <DocumentsTable documents={filteredDocuments} />
-      
+      {loading ? (
+        <div className="rounded-lg border border-border bg-white p-10 text-center text-sm text-text-secondary">
+          Loading documents…
+        </div>
+      ) : (
+        <DocumentsTable documents={filteredDocuments} onSaved={loadDocuments} />
+      )}
+
       {isFiltered && (
         <div className="mt-4 flex">
           <button

@@ -5,7 +5,6 @@ import {
   BadgeCheck,
   Hourglass,
   CalendarRange,
-  type LucideIcon,
 } from "lucide-react";
 
 interface StatsBarProps {
@@ -80,7 +79,6 @@ export default function StatsBar({
           bgClass,
           iconClass,
           textClass,
-          isSelected,
           onClick,
         }) => (
           <button

@@ -1,7 +1,10 @@
 "use client";
 
 import { CalendarRange, FileText, XCircle, Search } from "lucide-react";
-import Select from "../Select";
+import type { DocumentRecord } from "@/lib/types";
+import Select from "../ui/Select";
+import SetExpiryDialog from "./dialogs/SetExpiryDialog";
+import ReviewActionDialog from "./dialogs/ReviewActionDialog";
 
 interface FilterBarProps {
   searchQuery: string;
@@ -11,9 +14,9 @@ interface FilterBarProps {
   selectedStatus: string;
   onStatusSelect: (status: string) => void;
   onClearAll: () => void;
+  reviewDocument?: DocumentRecord;
 }
 
-/** Filter/search toolbar between the stats bar and the alert banner. */
 export default function FilterBar({
   searchQuery,
   onSearchChange,
@@ -22,6 +25,7 @@ export default function FilterBar({
   selectedStatus,
   onStatusSelect,
   onClearAll,
+  reviewDocument,
 }: FilterBarProps) {
   const documentTypes = [
     "All",
@@ -58,22 +62,27 @@ export default function FilterBar({
         renderTrigger={() => <span>Status</span>}
       />
 
-      {/* Static Placeholders matching the mockup */}
-      <button
-        type="button"
-        className="inline-flex items-center gap-2 rounded-md border border-border bg-white px-3 py-2 text-sm text-text-primary transition-colors hover:bg-surface"
-      >
-        <CalendarRange size={16} className="text-text-secondary" />
-        Set Expiry
-      </button>
+      {/* Set Expiry */}
+      <SetExpiryDialog>
+        <button
+          type="button"
+          className="inline-flex items-center gap-2 rounded-md border border-border bg-white px-3 py-2 text-sm text-text-primary transition-colors hover:bg-surface"
+        >
+          <CalendarRange size={16} className="text-text-secondary" />
+          Set Expiry
+        </button>
+      </SetExpiryDialog>
 
-      <button
-        type="button"
-        className="inline-flex items-center gap-2 rounded-md border border-border bg-white px-3 py-2 text-sm text-text-primary transition-colors hover:bg-surface"
-      >
-        <FileText size={16} className="text-text-secondary" />
-        Review &amp; Take Action
-      </button>
+      {/* Review & Take Action */}
+      <ReviewActionDialog document={reviewDocument}>
+        <button
+          type="button"
+          className="inline-flex items-center gap-2 rounded-md border border-border bg-white px-3 py-2 text-sm text-text-primary transition-colors hover:bg-surface"
+        >
+          <FileText size={16} className="text-text-secondary" />
+          Review &amp; Take Action
+        </button>
+      </ReviewActionDialog>
 
       {/* Clear All Trigger */}
       {hasActiveFilters && (
