@@ -103,7 +103,7 @@ export default function DocumentManagementPage() {
     searchQuery !== "" || selectedType !== "All" || selectedStatus !== "All";
 
   return (
-    <div className="mx-auto flex max-w-[1200px] flex-col gap-4 p-8">
+    <div className="mx-auto flex max-w-[1200px] flex-col gap-4 p-4 sm:p-6 lg:p-8">
       <PageHeading onSaved={loadDocuments} />
       <StatsBar
         stats={totalStats}

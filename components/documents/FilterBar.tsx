@@ -96,8 +96,8 @@ export default function FilterBar({
         </button>
       )}
 
-      {/* Search pushed to the far right */}
-      <div className="relative ml-auto">
+      {/* Search */}
+      <div className="relative w-full sm:ml-auto sm:w-auto">
         <Search
           size={16}
           className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary"
@@ -107,7 +107,7 @@ export default function FilterBar({
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search Document...."
-          className="w-64 rounded-md border border-border bg-white py-2 pl-9 pr-3 text-sm text-text-primary outline-none placeholder:text-text-secondary focus:border-primary transition-colors"
+          className="w-full rounded-md border border-border bg-white py-2 pl-9 pr-3 text-sm text-text-primary outline-none placeholder:text-text-secondary focus:border-primary transition-colors sm:w-64"
         />
       </div>
     </div>

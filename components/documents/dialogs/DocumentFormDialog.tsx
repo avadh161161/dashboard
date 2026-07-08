@@ -147,7 +147,7 @@ export default function DocumentFormDialog({
           {/* Document Information */}
           <SectionCard title="Document Information">
             <div className="flex flex-col gap-4">
-              <div className="flex gap-4">
+              <div className="flex flex-col gap-4 sm:flex-row">
                 <Field label="Document Name *">
                   <input
                     className={inputClass}
@@ -190,7 +190,7 @@ export default function DocumentFormDialog({
 
           {/* Document Dates */}
           <SectionCard title="Document Dates">
-            <div className="flex gap-4">
+            <div className="flex flex-col gap-4 sm:flex-row">
               <Field label="Issued Date">
                 <input
                   type="date"
@@ -211,7 +211,7 @@ export default function DocumentFormDialog({
           </SectionCard>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-4">
+          <div className="flex flex-wrap items-center justify-end gap-4">
             {error && <p className="mr-auto text-xs text-critical">{error}</p>}
             <DialogClose className="flex h-10 w-[121px] items-center justify-center rounded-[5px] border border-primary text-xs font-medium text-primary transition-colors hover:bg-primary/5">
               Cancel

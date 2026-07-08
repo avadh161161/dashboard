@@ -40,7 +40,7 @@ export default function Pagination({
   ];
 
   return (
-    <div className="flex flex-wrap items-center gap-4 px-6 py-4 text-sm text-text-secondary">
+    <div className="flex flex-wrap items-center justify-center gap-4 px-4 py-4 text-sm text-text-secondary sm:justify-start sm:px-6">
       <span>
         {rangeStart}-{rangeEnd} of {total} Documents
       </span>

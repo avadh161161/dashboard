@@ -2,7 +2,6 @@
 
 import { useRef, useState } from "react";
 import { Upload, FileText, X, Link2 } from "lucide-react";
-import Image from "next/image";
 
 export interface UploadedMedia {
   url: string;

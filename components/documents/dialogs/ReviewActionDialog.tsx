@@ -107,7 +107,7 @@ export default function ReviewActionDialog({
             <p className="text-lg font-semibold text-primary">
               Document Information
             </p>
-            <div className="flex items-center justify-between gap-4 rounded-lg bg-surface p-5">
+            <div className="flex flex-col-reverse items-start gap-4 rounded-lg bg-surface p-5 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex flex-col gap-2 text-xs text-text-primary">
                 {info.map(([label, value]) => (
                   <p key={label} className="flex gap-2">
@@ -162,7 +162,7 @@ export default function ReviewActionDialog({
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-4">
+          <div className="flex flex-wrap items-center justify-end gap-4">
             <DialogClose className="flex h-10 w-[121px] items-center justify-center rounded-[5px] border border-primary text-xs font-medium text-primary transition-colors hover:bg-primary/5">
               Cancel
             </DialogClose>

@@ -18,6 +18,48 @@ const columns = [
   "Action",
 ];
 
+/** View / Edit / Download controls, shared by the table row and the mobile card. */
+function RowActions({
+  doc,
+  onSaved,
+}: {
+  doc: DocumentRecord;
+  onSaved?: (document: DocumentRecord) => void;
+}) {
+  return (
+    <div className="flex items-center gap-3 text-text-secondary">
+      <DocumentPreviewDialog document={doc}>
+        <div className="relative inline-block group">
+          <button type="button" aria-label="View">
+            <Eye size={18} />
+          </button>
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-[#eff6ff] px-2 py-1 text-xs text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100 whitespace-nowrap">
+            View
+          </span>
+        </div>
+      </DocumentPreviewDialog>
+      <DocumentFormDialog mode="edit" document={doc} onSaved={onSaved}>
+        <div className="relative inline-block group">
+          <button type="button" aria-label="Edit">
+            <Pencil size={16} />
+          </button>
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-[#eff6ff] px-2 py-1 text-xs text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100 whitespace-nowrap">
+            Edit
+          </span>
+        </div>
+      </DocumentFormDialog>
+      <div className="relative inline-block group">
+        <a href={doc.uploadUrl} download aria-label="Download">
+          <Download size={16} />
+        </a>
+        <span className="absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-[#eff6ff] px-2 py-1 text-xs text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100 whitespace-nowrap">
+          Download
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default function DocumentsTable({
   documents,
   onSaved,
@@ -46,7 +88,8 @@ export default function DocumentsTable({
 
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-white">
-      <div className="overflow-x-auto">
+      {/* Table — md and up */}
+      <div className="hidden overflow-x-auto md:block">
         <table className="w-full min-w-[900px] text-left text-sm">
           <thead>
             <tr className="border-b border-border text-text-secondary">
@@ -103,40 +146,7 @@ export default function DocumentsTable({
                   <StatusBadge status={doc.status} />
                 </td>
                 <td className="px-6 py-4">
-                  <div className="flex items-center gap-3 text-text-secondary">
-                    <DocumentPreviewDialog document={doc}>
-                      <div className="relative inline-block group">
-                        <button type="button" aria-label="View">
-                          <Eye size={18} />
-                        </button>
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-[#eff6ff] px-2 py-1 text-xs text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100 whitespace-nowrap">
-                          View
-                        </span>
-                      </div>
-                    </DocumentPreviewDialog>
-                    <DocumentFormDialog
-                      mode="edit"
-                      document={doc}
-                      onSaved={onSaved}
-                    >
-                      <div className="relative inline-block group">
-                        <button type="button" aria-label="Edit">
-                          <Pencil size={16} />
-                        </button>
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-[#eff6ff] px-2 py-1 text-xs text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100 whitespace-nowrap">
-                          Edit
-                        </span>
-                      </div>
-                    </DocumentFormDialog>
-                    <div className="relative inline-block group">
-                      <a href={doc.uploadUrl} download aria-label="Download">
-                        <Download size={16} />
-                      </a>
-                      <span className="absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-[#eff6ff] px-2 py-1 text-xs text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100 whitespace-nowrap">
-                        Download
-                      </span>
-                    </div>
-                  </div>
+                  <RowActions doc={doc} onSaved={onSaved} />
                 </td>
               </tr>
             ))}
@@ -152,6 +162,54 @@ export default function DocumentsTable({
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Cards — below md */}
+      <div className="divide-y divide-border md:hidden">
+        {paginatedDocuments.map((doc) => (
+          <div key={doc.id} className="flex flex-col gap-3 p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-primary"
+                />
+                <div className="min-w-0">
+                  <p
+                    className="text-sm font-medium text-text-primary"
+                    title={doc.description}
+                  >
+                    {doc.name}
+                  </p>
+                  <p className="mt-0.5 text-xs text-text-secondary">
+                    {doc.type} · {doc.uploadedBy}
+                  </p>
+                </div>
+              </div>
+              <StatusBadge status={doc.status} />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <span className="text-text-secondary">Issued</span>
+                <p className="text-text-primary">{doc.issuedDate}</p>
+              </div>
+              <div>
+                <span className="text-text-secondary">Expiry</span>
+                <p className="text-text-primary">{doc.expiryDate ?? "-"}</p>
+              </div>
+            </div>
+
+            <div className="pt-1">
+              <RowActions doc={doc} onSaved={onSaved} />
+            </div>
+          </div>
+        ))}
+        {paginatedDocuments.length === 0 && (
+          <div className="px-6 py-10 text-center text-sm text-text-secondary">
+            No documents found.
+          </div>
+        )}
       </div>
 
       <div className="border-t border-border">
