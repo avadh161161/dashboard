@@ -16,7 +16,7 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
         <Menu size={22} />
       </button>
 
-      <div className="flex items-center gap-4">
+      <div className="ml-auto flex items-center gap-4">
         <button
           type="button"
           aria-label="Notifications"
